@@ -28,6 +28,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#ifndef _ASCII_PRINTER_INCLUDED
+#define _ASCII_PRINTER_INCLUDED
+#endif
+
 typedef unsigned int (* write_func)(char* asciiChars, unsigned int numAsciiChars);
 
 
