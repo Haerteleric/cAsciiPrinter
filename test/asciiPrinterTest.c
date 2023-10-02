@@ -9,9 +9,9 @@
 
 //following just for testing
 #define ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION
-#include "asciiPrinter.h" //Prototype
+#include "asciiPrinter_t.h" //Prototype
 #undef ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION
-#include "asciiPrinter.h" //Implementation
+#include "asciiPrinter_t.h" //Implementation
 /***********************************************************************************/
 
 static char buffer[100];
