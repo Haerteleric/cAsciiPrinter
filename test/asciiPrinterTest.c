@@ -14,50 +14,85 @@
 #include "asciiPrinter_t.h" //Implementation
 /***********************************************************************************/
 
-static char buffer[100];
-static int bufferLength = 0;
 
 
-unsigned print(char * data, unsigned int dataLength)
-{
-    for (unsigned int i = 0; i < dataLength; i++)
-    {
-        buffer[bufferLength++] = data [i];
-    }
-    return dataLength;
-}
 int main(void)
 {
-    clock_t startTime = clock();
-   
-    unsigned int value = 0xcafeaffe;
-    ascii_putHexLittleEndian(print, &value, sizeof(value));
-    buffer[bufferLength++] = '\0';
-    assert(strcmp("CAFEAFFE\0",buffer) == 0);
-    bufferLength = 0;
+    char out[500];
+    unsigned int outPos = 0;
+    memset(out, 0, sizeof(out));
+
+    //Test unsigned print
+    outPos = ascii_sprintf(out, "%u", 2);
+    assert(strcmp("2",out) == 0);
+    memset(out, 0, sizeof(out));
+
+    outPos = ascii_sprintf(out, "%u", 0);
+    assert(strcmp("0",out) == 0);
+    memset(out, 0, sizeof(out));
     
-    value = 0x123cadd;
-    ascii_putHexLittleEndian(print, &value, sizeof(value));
-    buffer[bufferLength++] = '\0';
-    assert(strcmp("0123CADD\0",buffer) == 0);
-    bufferLength = 0;
+    outPos = ascii_sprintf(out, "%u", 55432);
+    assert(strcmp("55432",out) == 0);
+    memset(out, 0, sizeof(out));
 
-    value = 12345;
-    ascii_putUnsignedDecimal(print, value);
-    buffer[bufferLength++] = '\0';
-    assert(strcmp("12345\0",buffer) == 0);
-    bufferLength = 0;
+    outPos = ascii_sprintf(out, "%u", 88843);
+    assert(strcmp("88843",out) == 0);
+    memset(out, 0, sizeof(out));
+     
+    outPos = ascii_sprintf(out, "%u", 7777777);
+    assert(strcmp("7777777",out) == 0);
+    memset(out, 0, sizeof(out));
+
+
+    //Test Signed print
+    outPos = ascii_sprintf(out, "%i", -2);
+    assert(strcmp("-2",out) == 0);
+    memset(out, 0, sizeof(out));
+
+    outPos = ascii_sprintf(out, "%i", -0);
+    assert(strcmp("0",out) == 0);
+    memset(out, 0, sizeof(out));
     
-    ascii_putNibbleHex(print, 0xA);
-    buffer[bufferLength++] = '\0';
-    assert(strcmp("A\0",buffer) == 0);
-    bufferLength = 0;
+    outPos = ascii_sprintf(out, "%i", -55432);
+    assert(strcmp("-55432",out) == 0);
+    memset(out, 0, sizeof(out));
 
-    ascii_putNibbleHex(print, 0x0);
-    buffer[bufferLength++] = '\0';
-    assert(strcmp("0\0",buffer) == 0);
-    bufferLength = 0;
+    outPos = ascii_sprintf(out, "%i", -88843);
+    assert(strcmp("-88843",out) == 0);
+    memset(out, 0, sizeof(out));
+     
+    outPos = ascii_sprintf(out, "%i", -7777777);
+    assert(strcmp("-7777777",out) == 0);
+    memset(out, 0, sizeof(out));
 
-    double elapsedTime = (double)(clock() - startTime) / CLOCKS_PER_SEC;
-    printf("Done in %f seconds\n", elapsedTime);
+    //Test Hex print
+    union 
+    {
+        unsigned int asInt;
+        unsigned char asStream[sizeof(unsigned int)];
+    }testHexValues=
+    {
+        .asStream = {0x00,0xBB,0x22,0xAA}
+    };
+
+    outPos = ascii_sprintf(out, "%x", testHexValues.asInt);
+    assert(strcmp("AA22BB00",out) == 0);
+    memset(out, 0, sizeof(out));
+
+    outPos = ascii_sprintf(out, "%x01", &testHexValues.asStream);
+    assert(strcmp("00",out) == 0);
+    memset(out, 0, sizeof(out));
+
+    outPos = ascii_sprintf(out, "%x02", &testHexValues.asStream);
+    assert(strcmp("00BB",out) == 0);
+    memset(out, 0, sizeof(out));
+
+    outPos = ascii_sprintf(out, "%x03", &testHexValues.asStream);
+    assert(strcmp("00BB22",out) == 0);
+    memset(out, 0, sizeof(out));
+
+    outPos = ascii_sprintf(out, "%x04", &testHexValues.asStream);
+    assert(strcmp("00BB22AA",out) == 0);
+    memset(out, 0, sizeof(out));
+
 }

@@ -95,6 +95,25 @@ unsigned int ascii_putByteHex(char * dest, unsigned char byte)
 }
 #endif // NOT(ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION)
 
+#ifdef ASCII_PRINTER_INLINE_IMPLEMENTATION
+inline
+#endif 
+#ifdef ASCII_PRINTER_STATIC_IMPLEMENTATION
+static
+#endif 
+unsigned int ascii_putHexByteStream(char * dest, unsigned char * stream, unsigned int len)
+#ifdef ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION
+;
+#else
+{
+    for (unsigned int i = 0; i < len; i++)
+    {
+        ascii_putByteHex(&dest[i*2],stream[i]);
+    }
+
+    return len*2;
+}
+#endif // NOT(ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION)
 
 
 #ifdef ASCII_PRINTER_INLINE_IMPLEMENTATION
@@ -150,6 +169,30 @@ unsigned int ascii_putUnsignedDecimal(char * dest, unsigned int unsignedNum)
 }
 #endif // NOT(ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION)
 
+#ifdef ASCII_PRINTER_INLINE_IMPLEMENTATION
+inline
+#endif 
+#ifdef ASCII_PRINTER_STATIC_IMPLEMENTATION
+static
+#endif 
+unsigned int ascii_putSignedDecimal(char * dest, signed int signedNum)
+#ifdef ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION
+;
+#else
+{
+    unsigned int numCharsWritten = 0;
+
+    if(signedNum < 0)
+    {
+        dest[numCharsWritten++] = '-';
+        signedNum = -signedNum;
+    }
+
+    numCharsWritten += ascii_putUnsignedDecimal(&dest[numCharsWritten], signedNum);
+
+    return numCharsWritten;
+}
+#endif // NOT(ASCII_PRINTER_ONLY_PROTOTYPE_DECLARATION)
 
 
 #ifdef ASCII_PRINTER_INLINE_IMPLEMENTATION
@@ -250,15 +293,31 @@ unsigned int ascii_vsprintf(char * dest, const char * msgFormat, va_list vaList)
               numCharsWritten += ascii_putUnsignedDecimal(&dest[numCharsWritten], decValue);
             }break;
 
-          case 'x':
+          case 'i':
             {
-              unsigned int hexValue = va_arg(vaList, unsigned int);
-              numCharsWritten += ascii_putHexLittleEndian(&dest[numCharsWritten], (unsigned char * )&hexValue ,sizeof(unsigned int));
+              signed int decValue = va_arg(vaList, unsigned int);
+              numCharsWritten += ascii_putSignedDecimal(&dest[numCharsWritten], decValue);
             }break;
 
           case 's':
             {
               numCharsWritten += ascii_putString(&dest[numCharsWritten],va_arg(vaList, char *));
+            }break;
+
+          case 'x':
+            {
+              if(msgFormat[parsePos + 1] == '0')
+              {
+                parsePos++;
+                unsigned char * startAddress = va_arg(vaList, unsigned char *);
+                unsigned int bytesToPrint = msgFormat[++parsePos] - '0';
+                numCharsWritten += ascii_putHexByteStream(&dest[numCharsWritten], startAddress, bytesToPrint);
+              }
+              else
+              {
+                unsigned int hexValue = va_arg(vaList, unsigned int);
+                numCharsWritten += ascii_putHexLittleEndian(&dest[numCharsWritten], (unsigned char * )&hexValue ,sizeof(unsigned int));
+              }
             }break;
 
           default:
