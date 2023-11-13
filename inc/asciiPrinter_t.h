@@ -294,6 +294,7 @@ unsigned int ascii_vsprintf(char * dest, const char * msgFormat, va_list vaList)
             }break;
 
           case 'i':
+          case 'd':
             {
               signed int decValue = va_arg(vaList, unsigned int);
               numCharsWritten += ascii_putSignedDecimal(&dest[numCharsWritten], decValue);
@@ -306,18 +307,15 @@ unsigned int ascii_vsprintf(char * dest, const char * msgFormat, va_list vaList)
 
           case 'x':
             {
-              if(msgFormat[parsePos + 1] == '0')
-              {
-                parsePos++;
-                unsigned char * startAddress = va_arg(vaList, unsigned char *);
-                unsigned int bytesToPrint = msgFormat[++parsePos] - '0';
-                numCharsWritten += ascii_putHexByteStream(&dest[numCharsWritten], startAddress, bytesToPrint);
-              }
-              else
-              {
-                unsigned int hexValue = va_arg(vaList, unsigned int);
-                numCharsWritten += ascii_putHexLittleEndian(&dest[numCharsWritten], (unsigned char * )&hexValue ,sizeof(unsigned int));
-              }
+              unsigned int hexValue = va_arg(vaList, unsigned int);
+              numCharsWritten += ascii_putHexLittleEndian(&dest[numCharsWritten], (unsigned char * )&hexValue ,sizeof(unsigned int));
+            }break;
+
+          case '%':
+            {
+              unsigned char * startAddress = va_arg(vaList, unsigned char *);
+              unsigned int  streamLength = va_arg(vaList, unsigned int);
+              numCharsWritten += ascii_putHexByteStream(&dest[numCharsWritten], startAddress, streamLength);
             }break;
 
           default:

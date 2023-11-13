@@ -79,19 +79,19 @@ int main(void)
     assert(strcmp("AA22BB00",out) == 0);
     memset(out, 0, sizeof(out));
 
-    outPos = ascii_sprintf(out, "%x01", &testHexValues.asStream);
+    outPos = ascii_sprintf(out, "%%", /*%%*/&testHexValues.asStream, 1 /*%%*/);
     assert(strcmp("00",out) == 0);
     memset(out, 0, sizeof(out));
 
-    outPos = ascii_sprintf(out, "%x02", &testHexValues.asStream);
+    outPos = ascii_sprintf(out, "%%", /*%%*/&testHexValues.asStream, 2 /*%%*/);
     assert(strcmp("00BB",out) == 0);
     memset(out, 0, sizeof(out));
 
-    outPos = ascii_sprintf(out, "%x03", &testHexValues.asStream);
+    outPos = ascii_sprintf(out, "%%", /*%%*/&testHexValues.asStream, 3 /*%%*/);
     assert(strcmp("00BB22",out) == 0);
     memset(out, 0, sizeof(out));
 
-    outPos = ascii_sprintf(out, "%x04", &testHexValues.asStream);
+    outPos = ascii_sprintf(out, "%%", /*%%*/&testHexValues.asStream, 4 /*%%*/);
     assert(strcmp("00BB22AA",out) == 0);
     memset(out, 0, sizeof(out));
 
